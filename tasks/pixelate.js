@@ -15,30 +15,11 @@ const chalk = require('chalk');
 
 module.exports = (grunt) => {
 
-	let pixelate = (inputFile, outputDirectory, options, cb) => {
-		const baseFileName = path.basename(inputFile);
-		const extension = path.extname(inputFile);
-		const outputFile = path.normalize(outputDirectory + path.basename(inputFile, extension) + options.suffix + extension);
-		const outputFileExists = fs.existsSync(outputFile);
-
-		if (outputFileExists && options.skipExisting) {
-			grunt.log.writeln(chalk.yellow('\t\tSkipping "' + inputFile + '" ... output file "' + outputFile + '" exists!'));
-		} else {
-			jimp.read(inputFile).then(function (image) {
-				grunt.log.write('\tProcessing ' + chalk.bold(inputFile) + ' ... ');
-				image.pixelate(options.size).quality(options.quality).write(outputFile);
-
-				grunt.log.write(chalk.green('OK'));
-				grunt.log.writeln(' => ' + outputFile);
-
-				if (cb !== false) cb();
-			}).catch(function (err) {
-				grunt.log.writeln(chalk.red(err));
-			});
-		}
-	}
-
 	grunt.registerMultiTask('pixelate', 'A grunt plugin to pixelate images', function() {
+		let currentFileIndex = 0;
+		let maxFileIndex = 0;
+		let done = this.async();
+
 		let options = this.options({
 			suffix: '_pixelated',
 			skipExisting: true,
@@ -46,23 +27,49 @@ module.exports = (grunt) => {
 			quality: 100
 		});
 
-		let done = this.async();
+		let pixelate = (files, outputDirectory) => {
+			const filepath = files[currentFileIndex];
+			const baseFileName = path.basename(filepath);
+			const extension = path.extname(filepath);
+			const outputFile = path.normalize(outputDirectory + path.basename(filepath, extension) + options.suffix + extension);
+			const outputFileExists = fs.existsSync(outputFile);
+			currentFileIndex++;
 
-		this.files.forEach(function(file, idx) {
+			grunt.log.write('\tProcessing file ' + chalk.bold(filepath));
+
+			if (outputFileExists && options.skipExisting) {
+				grunt.log.write(' => ' + chalk.bold(outputFile) + ' ... ');
+				grunt.log.writeln(chalk.yellow('SKIPPED! Target file exists!'));
+				processNext(files, outputDirectory);
+			} else {
+				jimp.read(filepath).then(function (image) {
+					image.pixelate(options.size).quality(options.quality).write(outputFile, () => {
+						grunt.log.write(' => ' + chalk.bold(outputFile) + ' ... ');
+						grunt.log.writeln(chalk.green('OK'));
+						processNext(files, outputDirectory);
+					});
+				}).catch(function (err) {
+					grunt.log.writeln(chalk.red(err));
+					processNext(files, outputDirectory);
+				});
+			}
+		};
+
+		let processNext = (files, outputDirectory) => {
+			if (currentFileIndex < maxFileIndex) {
+				pixelate(files, outputDirectory);
+			} else {
+				done();
+			}
+		};
+
+		for (let i = 0; i < this.files.length; i++) {
+			const file = this.files[i];
 			const files = file.src;
-
-			let src = file.src.filter(function(filepath) {
-				if (!grunt.file.exists(filepath)) {
-					grunt.log.warn('Source file "' + filepath + '" not found.');
-					return false;
-				} else {
-					return true;
-				}
-			}).map(function(filepath, idx) {
-				const cb = (idx === files.length - 1) ? done : false;
-				pixelate(filepath, file.dest, options, cb);
-			});
-		});
+			currentFileIndex = 0;
+			maxFileIndex = files.length;
+			processNext(files, file.dest);
+		}
 	});
 
 };
