@@ -1,0 +1,38 @@
+{
+  "name": "grunt-pixelate",
+  "description": "A grunt plugin to pixelate images",
+  "version": "0.1.0",
+  "homepage": "https://github.com/pixel-shock/grunt-pixelate",
+  "author": {
+    "name": "Wehe, Tino",
+    "email": "tino.wehe@brandrockers.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pixel-shock/grunt-pixelate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pixel-shock/grunt-pixelate/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/pixel-shock/grunt-pixelate/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 8.7.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
