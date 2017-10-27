@@ -1,3 +1,7 @@
 node_modules
 npm-debug.log
 tmp
+assets/output/*.jpg
+assets/output/*.jpeg
+assets/output/*.png
+assets/output/*.bmp

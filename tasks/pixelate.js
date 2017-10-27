@@ -8,42 +8,60 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+const path = require('path');
+const fs = require('fs');
+const jimp = require("jimp");
+const chalk = require('chalk');
 
-	// Please see the Grunt documentation for more information regarding task
-	// creation: http://gruntjs.com/creating-tasks
+module.exports = (grunt) => {
+
+	let pixelate = (inputFile, outputDirectory, options, cb) => {
+		const baseFileName = path.basename(inputFile);
+		const extension = path.extname(inputFile);
+		const outputFile = path.normalize(outputDirectory + path.basename(inputFile, extension) + options.suffix + extension);
+		const outputFileExists = fs.existsSync(outputFile);
+
+		if (outputFileExists && options.skipExisting) {
+			grunt.log.writeln(chalk.yellow('\t\tSkipping "' + inputFile + '" ... output file "' + outputFile + '" exists!'));
+		} else {
+			jimp.read(inputFile).then(function (image) {
+				grunt.log.write('\tProcessing ' + chalk.bold(inputFile) + ' ... ');
+				image.pixelate(options.size).quality(options.quality).write(outputFile);
+
+				grunt.log.write(chalk.green('OK'));
+				grunt.log.writeln(' => ' + outputFile);
+
+				if (cb !== false) cb();
+			}).catch(function (err) {
+				grunt.log.writeln(chalk.red(err));
+			});
+		}
+	}
 
 	grunt.registerMultiTask('pixelate', 'A grunt plugin to pixelate images', function() {
-		// Merge task-specific and/or target-specific options with these defaults.
-		var options = this.options({
-			punctuation: '.',
-			separator: ', '
+		let options = this.options({
+			suffix: '_pixelated',
+			skipExisting: true,
+			size: 10,
+			quality: 100
 		});
 
-		// Iterate over all specified file groups.
-		this.files.forEach(function(f) {
-			// Concat specified files.
-			var src = f.src.filter(function(filepath) {
-				// Warn on and remove invalid source files (if nonull was set).
+		let done = this.async();
+
+		this.files.forEach(function(file, idx) {
+			const files = file.src;
+
+			let src = file.src.filter(function(filepath) {
 				if (!grunt.file.exists(filepath)) {
 					grunt.log.warn('Source file "' + filepath + '" not found.');
 					return false;
 				} else {
 					return true;
 				}
-			}).map(function(filepath) {
-				// Read file source.
-				return grunt.file.read(filepath);
-			}).join(grunt.util.normalizelf(options.separator));
-
-			// Handle options.
-			src += options.punctuation;
-
-			// Write the destination file.
-			grunt.file.write(f.dest, src);
-
-			// Print a success message.
-			grunt.log.writeln('File "' + f.dest + '" created.');
+			}).map(function(filepath, idx) {
+				const cb = (idx === files.length - 1) ? done : false;
+				pixelate(filepath, file.dest, options, cb);
+			});
 		});
 	});
 

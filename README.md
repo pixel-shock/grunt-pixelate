@@ -1,6 +1,6 @@
 # grunt-pixelate
 
-> A grunt plugin to pixelate images
+> A grunt plugin to pixelate images using [jimp](https://www.npmjs.com/package/jimp)
 
 ## Getting Started
 This plugin requires Grunt `~1.0.1`
@@ -17,6 +17,7 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-pixelate');
 ```
 
+
 ## The "pixelate" task
 
 ### Overview
@@ -26,10 +27,19 @@ In your project's Gruntfile, add a section named `pixelate` to the data object p
 grunt.initConfig({
   pixelate: {
     options: {
-      // Task-specific options go here.
+		suffix: '_pixelated',
+		skipExisting: true,
+		size: 10,
+		quality: 100
     },
-    your_target: {
-      // Target-specific file lists and/or options go here.
+    example_target: {
+    	options: {
+			suffix: '-pixelated-big-pixels',
+			size: 100
+		},
+		files: {
+			'assets/output/': 'assets/input/**/*.jpg'
+		}
     },
   },
 });
@@ -37,53 +47,35 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
+#### options.suffix
 Type: `String`
-Default value: `',  '`
+Default value: `'_pixelated'`
 
-A string value that is used to do something with whatever.
+This string value will be appened to the output file name.
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+#### options.skipExisting
+Type: `Boolean`
+Default value: `true`
 
-A string value that is used to do something else with whatever else.
+Indicates whether existing files should be skipped or not.
 
-### Usage Examples
+#### options.size
+Type: `Integer`
+Default value: `10`
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+The size of the pixelation.
 
-```js
-grunt.initConfig({
-  pixelate: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
+#### options.quality
+Type: `Integer`
+Default value: `100`
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  pixelate: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
+The output quality for the image.
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
 _(Nothing yet)_
+
+## NOTE
+The images included in the "assets/input" directory are copyright by Tino Wehe. You are **NOT allowed** to use them outside of this git repository.

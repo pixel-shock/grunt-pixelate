@@ -25,25 +25,28 @@ module.exports = function(grunt) {
 
 		// Before generating any new files, remove any previously-created files.
 		clean: {
-			tests: ['tmp']
+			tests: ['tmp'],
+			output: ['assets/output/**/*.jpg']
 		},
 
 		// Configuration to be run (and then tested).
 		pixelate: {
-			default_options: {
+			bigPixels: {
 				options: {
+					suffix: '-pixelated-big-pixels',
+					size: 100
 				},
 				files: {
-					'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
+					'assets/output/': 'assets/input/**/*.jpg'
 				}
 			},
-			custom_options: {
+			smallPixels: {
 				options: {
-					separator: ': ',
-					punctuation: ' !!!'
+					suffix: '-pixelated-small-pixels',
+					size: 10
 				},
 				files: {
-					'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
+					'assets/output/': 'assets/input/**/*.jpg'
 				}
 			}
 		},

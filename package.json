@@ -34,5 +34,9 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "jimp": "^0.2.28"
+  }
 }
