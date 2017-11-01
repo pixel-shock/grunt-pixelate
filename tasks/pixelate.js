@@ -22,8 +22,9 @@ module.exports = (grunt) => {
 
 		let options = this.options({
 			suffix: '_pixelated',
-			skipExisting: true,
+			skipExisting: false,
 			size: 10,
+			relativeSize: false,
 			quality: 100
 		});
 
@@ -33,6 +34,7 @@ module.exports = (grunt) => {
 			const extension = path.extname(filepath);
 			const outputFile = path.normalize(outputDirectory + path.basename(filepath, extension) + options.suffix + extension);
 			const outputFileExists = fs.existsSync(outputFile);
+			let relSize = false;
 			currentFileIndex++;
 
 			grunt.log.write('\tProcessing file ' + chalk.bold(filepath));
@@ -43,7 +45,13 @@ module.exports = (grunt) => {
 				processNext(files, outputDirectory);
 			} else {
 				jimp.read(filepath).then(function (image) {
-					image.pixelate(options.size).quality(options.quality).write(outputFile, () => {
+
+					if (options.relativeSize === true) {
+						let width = image.bitmap.width;
+						relSize = Math.round(width * options.size / 100);
+					}
+
+					image.pixelate( (relSize !== false) ? relSize : options.size).quality(options.quality).write(outputFile, () => {
 						grunt.log.write(' => ' + chalk.bold(outputFile) + ' ... ');
 						grunt.log.writeln(chalk.green('OK'));
 						processNext(files, outputDirectory);
