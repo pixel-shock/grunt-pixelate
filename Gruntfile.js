@@ -34,16 +34,17 @@ module.exports = function(grunt) {
 			bigPixels: {
 				options: {
 					suffix: '-pixelated-big-pixels',
-					size: 100
+					size: 100,
 				},
 				files: {
 					'assets/output/': 'assets/input/**/*.jpg'
 				}
 			},
-			smallPixels: {
+			relativePixels: {
 				options: {
 					suffix: '-pixelated-small-pixels',
-					size: 10
+					size: 10,
+					relativeSize: true
 				},
 				files: {
 					'assets/output/': 'assets/input/**/*.jpg'

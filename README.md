@@ -65,6 +65,20 @@ Default value: `10`
 
 The size of the pixelation.
 
+#### options.relativeSize
+Type: `Boolean`
+Default value: `false`
+
+If `true` the value of `options.size` will be relative to the image width. 
+For example:
+
+```
+	options.relativeSize: true,
+	options.size: 10
+	
+	--> means that the desired pixelation will be 10% of the image width
+```
+
 #### options.quality
 Type: `Integer`
 Default value: `100`
